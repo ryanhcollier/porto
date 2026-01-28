@@ -1,3 +1,4 @@
+/* Core Reset */
 * {
   margin: 0;
   padding: 0;
@@ -7,8 +8,9 @@
 body, html {
   background-color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow: hidden;
+  overflow: hidden; 
   height: 100%;
+  width: 100%;
 }
 
 .porto-app {
@@ -16,6 +18,18 @@ body, html {
   height: 100vh;
   width: 100vw;
   position: relative;
+}
+
+/* Global Transition Fade */
+.global-fade-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 9999;
+  pointer-events: none;
 }
 
 .porto-nav {
@@ -27,13 +41,13 @@ body, html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 2000;
+  z-index: 4000;
   mix-blend-mode: difference;
   color: white;
   pointer-events: none;
 }
 
-.title, .info-link a {
+.title, .info-link {
   pointer-events: auto;
   font-weight: 700;
   font-size: 0.8rem;
@@ -41,28 +55,22 @@ body, html {
   text-transform: uppercase;
   text-decoration: none;
   color: inherit;
-}
-
-.ny-time {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  cursor: pointer;
 }
 
 .scroll-container {
   height: 100vh;
-  width: 100vw;
+  width: 100%; 
   overflow-y: scroll;
   scrollbar-width: none;
   scroll-snap-type: y mandatory;
-  scroll-behavior: auto !important;
-  -webkit-overflow-scrolling: touch;
+  background-color: #ffffff;
 }
 
 .scroll-container::-webkit-scrollbar { display: none; }
 
 .scroll-section {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -73,16 +81,31 @@ body, html {
 
 .image-wrapper {
   width: 60vw;
-  display: flex;
-  flex-direction: column;
   cursor: pointer;
+  position: relative;
+  will-change: transform, opacity; /* Support entry fade */
 }
 
-.image-wrapper video {
+.image-wrapper.is-expanding {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 5000;
+  background-color: #ffffff;
+}
+
+.image-wrapper img {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  transform: translateZ(0);
+  display: block;
+}
+
+.image-wrapper.is-expanding img {
+  aspect-ratio: auto;
+  height: 100%;
 }
 
 .gallery-label {
@@ -94,59 +117,65 @@ body, html {
   color: #000;
 }
 
+.image-wrapper.is-expanding .gallery-label {
+  display: none;
+}
+
 .project-detail-view {
-  position: absolute; /* Changed to absolute to sit directly on top of Home */
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
-  /* Transparent background is vital to see Home underneath expansion */
-  background: transparent; 
-  z-index: 1000;
+  background-color: #ffffff; 
+  z-index: 2000;
   overflow-y: auto;
 }
 
 .detail-hero {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-  background: transparent;
+  position: relative;
+  background-color: #ffffff;
 }
 
 .full-width-media {
   width: 100%;
   height: 100vh;
-  background: transparent;
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
 }
 
-.full-width-media video {
+.full-width-media img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  will-change: transform; 
 }
 
-/* This layer provides the solid white background as the user scrolls down */
 .detail-scroll-content {
-  padding: 6rem 2.5rem;
-  background: white;
+  padding: 8rem 2.5rem;
+  background-color: #ffffff;
   min-height: 100vh;
   position: relative;
+  z-index: 5;
 }
 
-.project-header {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-}
-
-.project-main-title {
+.detail-scroll-content h1 {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  margin-bottom: 2rem;
 }
 
-.project-long-desc {
+.detail-scroll-content p {
   font-size: 0.75rem;
-  line-height: 1.6;
+  line-height: 1.8;
   color: #666;
+  max-width: 600px;
 }
