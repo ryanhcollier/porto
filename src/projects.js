@@ -1,4 +1,3 @@
-// Ensure you have the 'export const' at the very beginning!
 export const projects = [
   {
     id: 1,
@@ -9,17 +8,42 @@ export const projects = [
       {
         type: "double",
         items: [
-          { 
-            type: "image", 
-            src: "/images/jackhenryheroimage.webp" 
-          },
+          { type: "image", src: "/images/jackhenryheroimage.webp" },
           { 
             type: "text", 
-            title: "The Objective", 
-            body: "Developing a visual language that balances heritage with modern tech." 
+            body: "Introducing the project wasn’t just about a new product—it was about a whole new era in automation and industrial application." 
           }
+        ]
+      },
+      // TIER: Mixed Video and Image
+      {
+        type: "double",
+        items: [
+          { 
+            type: "video", 
+            src: "/images/bb.mov" // Point to your video file
+          },
+          { type: "image", src: "/images/jackhenryheroimage.webp" }
+        ]
+      },
+      // TIER: Full-width Hero Video
+      {
+        type: "full",
+        items: [
+          { 
+            type: "video", 
+            src: "/images/bb.mov" 
+          }
+        ]
+      },
+      {
+        type: "triple",
+        items: [
+          { type: "image", src: "/images/jackhenryheroimage.webp" },
+          { type: "image", src: "/images/jackhenryheroimage.webp" },
+          { type: "image", src: "/images/jackhenryheroimage.webp" }
         ]
       }
     ]
   }
-]; // Ensure this closing bracket and semicolon are here!
+];
