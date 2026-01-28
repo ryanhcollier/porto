@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 import { projects } from './projects';
 import './App.css';
 
-// Optimized spring for high-performance scaling
-const transition = { 
-  type: "spring", 
-  stiffness: 100, 
-  damping: 30, 
-  mass: 1,
-  restDelta: 0.001 
-};
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+
+const sharedTransition = { type: "spring", stiffness: 160, damping: 26, mass: 0.8 };
 
 const Nav = () => {
+  // Restore dynamic NYC time logic
   const [time, setTime] = useState(new Date().toLocaleTimeString("en-US", { 
     timeZone: "America/New_York", hour12: false, hour: '2-digit', minute: '2-digit' 
   }));
@@ -56,34 +54,38 @@ const Home = () => {
   }, [location]);
 
   return (
-    <main className="scroll-container" ref={scrollRef}>
+    <motion.main 
+      className="scroll-container" 
+      ref={scrollRef}
+      exit={{ opacity: 1 }} 
+      transition={{ duration: 0.8 }}
+    >
       {projects.map((project) => (
         <section key={project.id} id={`section-${project.id}`} className="scroll-section">
           <motion.div 
             layoutId={`card-${project.id}`}
             className="image-wrapper"
             onClick={() => navigate(`/project/${project.id}`, { state: { fromId: project.id } })}
-            transition={transition}
+            transition={sharedTransition}
           >
             <motion.video 
               layoutId={`media-${project.id}`}
               src={project.video} 
               autoPlay muted loop playsInline
-              transition={transition}
-              /* Forces hardware acceleration */
-              style={{ translateZ: 0 }}
+              transition={sharedTransition}
             />
-            <motion.div className="gallery-label">{project.title}</motion.div>
+            <div className="gallery-label">{project.title}</div>
           </motion.div>
         </section>
       ))}
-    </main>
+    </motion.main>
   );
 };
 
 const ProjectDetail = () => {
   const { id } = useParams();
   const project = projects.find((p) => p.id === parseInt(id));
+  const isPresent = useIsPresent();
 
   if (!project) return null;
 
@@ -92,36 +94,29 @@ const ProjectDetail = () => {
       className="project-detail-view" 
       initial={false}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      exit={{ opacity: 0 }} 
+      transition={{ duration: 0.8, ease: "easeInOut" }}
     >
       <section className="detail-hero">
-        <motion.div layoutId={`card-${id}`} className="full-width-media" transition={transition}>
+        <motion.div 
+          layoutId={isPresent ? `card-${id}` : null} 
+          className="full-width-media"
+          transition={sharedTransition}
+        >
           <motion.video 
-            layoutId={`media-${id}`} 
+            layoutId={isPresent ? `media-${id}` : null} 
             src={project.video} 
             autoPlay muted loop playsInline 
-            transition={transition}
-            style={{ translateZ: 0 }}
+            transition={sharedTransition}
           />
         </motion.div>
       </section>
 
       <div className="detail-scroll-content">
         <header className="project-header">
-          <div className="header-left">
-            <h1 className="project-main-title">{project.title}</h1>
-          </div>
-          <div className="header-right">
-            <p className="project-long-desc">{project.description}</p>
-          </div>
+          <h1 className="project-main-title">{project.title}</h1>
+          <p className="project-long-desc">{project.description}</p>
         </header>
-        <div className="project-media-grid">
-           <div className="media-row">
-            <div className="media-col"><div className="placeholder-media"></div></div>
-            <div className="media-col"><div className="placeholder-media"></div></div>
-          </div>
-        </div>
       </div>
     </motion.div>
   );
@@ -129,7 +124,6 @@ const ProjectDetail = () => {
 
 export default function App() {
   const location = useLocation();
-
   return (
     <div className="porto-app">
       <Nav />
