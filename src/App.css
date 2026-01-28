@@ -20,7 +20,6 @@ body, html {
   position: relative;
 }
 
-/* Global Transition Fade */
 .global-fade-overlay {
   position: fixed;
   top: 0;
@@ -79,11 +78,20 @@ body, html {
   scroll-snap-align: start;
 }
 
-.image-wrapper {
+.card-outer {
   width: 60vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-wrapper {
+  width: 100%;
   cursor: pointer;
   position: relative;
-  will-change: transform, opacity; /* Support entry fade */
+  overflow: hidden; 
+  /* Critical for rendering clip-path during layout shifts */
+  transform-style: preserve-3d;
+  will-change: transform, border-radius, clip-path; 
 }
 
 .image-wrapper.is-expanding {
@@ -94,6 +102,7 @@ body, html {
   height: 100vh;
   z-index: 5000;
   background-color: #ffffff;
+  clip-path: none !important; 
 }
 
 .image-wrapper img {
@@ -115,10 +124,6 @@ body, html {
   letter-spacing: 0.15em;
   font-weight: 600;
   color: #000;
-}
-
-.image-wrapper.is-expanding .gallery-label {
-  display: none;
 }
 
 .project-detail-view {
@@ -145,6 +150,7 @@ body, html {
   position: relative;
   overflow: hidden;
   background-color: #ffffff;
+  will-change: transform, border-radius;
 }
 
 .full-width-media img {

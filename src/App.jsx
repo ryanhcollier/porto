@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Routes, Route, useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from './projects';
@@ -8,63 +8,81 @@ if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
 
-const fluidTransition = { 
-  duration: 1.1, 
-  ease: [0.7, 0, 0.3, 1] 
+const organicTransition = { 
+  duration: 1.4, 
+  ease: [0.6, 0.01, -0.05, 0.95] 
 };
 
-// Staggered entry for initial landing
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
+// Refined Shutter Reveal
+const shutterVariants = {
+  hidden: { 
+    clipPath: 'inset(49.9% 0% 49.9% 0%)',
+    opacity: 1
+  },
+  visible: { 
+    clipPath: 'inset(0% 0% 0% 0%)',
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.3 }
+    transition: { 
+      duration: 1.5, 
+      ease: [0.76, 0, 0.24, 1],
+      delay: 0.2 
+    } 
   }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
 const Home = () => {
   const navigate = useNavigate();
   const [expandingId, setExpandingId] = useState(null);
 
-  const handleExpand = (id) => {
-    setExpandingId(id);
-  };
+  const handleExpand = (id) => setExpandingId(id);
 
   return (
     <motion.main 
       className="scroll-container"
-      variants={containerVariants}
       initial="hidden"
-      animate="visible"
+      whileInView="visible"
+      viewport={{ once: true }}
       exit={{ opacity: 1 }}
-      transition={{ duration: 0 }}
     >
       {projects.map((project) => (
         <section key={project.id} className="scroll-section">
-          <motion.div 
-            variants={itemVariants}
-            layoutId={`card-${project.id}`}
-            className={`image-wrapper ${expandingId === project.id ? 'is-expanding' : ''}`}
-            onClick={() => handleExpand(project.id)}
-            transition={fluidTransition}
-            onLayoutAnimationComplete={() => {
-              if (expandingId === project.id) {
-                navigate(`/project/${project.id}`);
-              }
-            }}
-          >
-            <motion.img 
-              layoutId={`media-${project.id}`}
-              src={project.poster} 
-              transition={fluidTransition}
-            />
-            <div className="gallery-label">{project.title}</div>
-          </motion.div>
+          <div className="card-outer"> 
+            <motion.div 
+              variants={shutterVariants}
+              layoutId={`card-${project.id}`}
+              className={`image-wrapper ${expandingId === project.id ? 'is-expanding' : ''}`}
+              onClick={() => handleExpand(project.id)}
+              transition={organicTransition}
+              // Force corner radius to animate separately from clip-path
+              animate={{ 
+                borderRadius: expandingId === project.id ? "0px" : "12px",
+                // Ensure clipPath stays at 0% once revealed
+                clipPath: expandingId === project.id ? 'inset(0% 0% 0% 0%)' : undefined 
+              }}
+              style={{ overflow: "hidden", background: "#eee" }}
+              onLayoutAnimationComplete={() => {
+                if (expandingId === project.id) {
+                  navigate(`/project/${project.id}`);
+                }
+              }}
+            >
+              <motion.img 
+                layoutId={`media-${project.id}`}
+                src={project.poster} 
+                transition={organicTransition}
+                style={{ borderRadius: expandingId === project.id ? "0px" : "12px" }}
+              />
+            </motion.div>
+            <motion.div 
+              className="gallery-label"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1.4, duration: 0.8 }}
+            >
+              {project.title}
+            </motion.div>
+          </div>
         </section>
       ))}
     </motion.main>
@@ -80,7 +98,7 @@ const ProjectDetail = () => {
   return (
     <motion.div 
       className="project-detail-view"
-      initial={{ opacity: 0 }} // Fade in to cover the home fresh
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
@@ -89,12 +107,14 @@ const ProjectDetail = () => {
         <motion.div 
           layoutId={`card-${project.id}`} 
           className="full-width-media"
-          transition={fluidTransition} 
+          transition={organicTransition}
+          style={{ borderRadius: "0px", overflow: "hidden", clipPath: 'inset(0% 0% 0% 0%)' }}
         >
           <motion.img 
             layoutId={`media-${project.id}`}
             src={project.poster}
-            transition={fluidTransition}
+            transition={organicTransition}
+            style={{ borderRadius: "0px" }}
           />
         </motion.div>
       </section>
@@ -112,19 +132,17 @@ export default function App() {
   const navigate = useNavigate();
   const [isNavigatingHome, setIsNavigatingHome] = useState(false);
 
-  // Handle Title link click for fresh load
   const goHomeFresh = (e) => {
     e.preventDefault();
     setIsNavigatingHome(true);
     setTimeout(() => {
       navigate('/');
       setIsNavigatingHome(false);
-    }, 600); // Wait for white fade
+    }, 600);
   };
 
   return (
     <div className="porto-app">
-      {/* Global White Fade Overlay */}
       <AnimatePresence>
         {isNavigatingHome && (
           <motion.div 

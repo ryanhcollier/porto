@@ -11,7 +11,7 @@ export const projects = [
   {
     id: 2,
     title: "PROJECT TWO",
-    poster: "/images/project-2-poster.webp",
+    poster: "https://reil.studio/images/lo_duos.jpg", 
     video: "/videos/project-2.mp4",
     description: "An study in light, shadow, and the intersection of digital and organic textures."
   },
